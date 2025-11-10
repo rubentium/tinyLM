@@ -16,7 +16,7 @@
 
 ## Usage
 
-1. Prepare your dataset in the expected format. (default is set to SlimPajama-6B)
+1. Prepare your dataset in the expected format (default is set to SlimPajama-6B).
 2. Configure model hyperparameters in `main.py` or the config file.
 3. Train the model with:
 
