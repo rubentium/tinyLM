@@ -20,6 +20,9 @@ class SelfAttention(torch.nn.Module):
 
         # Compute attention scores
         scores = Q @ K.transpose(1, 2) / (self.embed_size ** 0.5)  # (batch_size, seq_len, seq_len)
+        inf_mask = torch.full_like(scores, float('-inf'))
+        mask = torch.triu(inf_mask, diagonal=1)
+        scores = scores + mask
         attn_weights = torch.nn.functional.softmax(scores, dim=-1)  # (batch_size, seq_len, seq_len)
         out = attn_weights @ V  # (batch_size, seq_len, embed_size)
 
@@ -52,6 +55,9 @@ class MultiHeadAttention(torch.nn.Module):
 
         # Compute attention scores
         scores = Q @ K.transpose(-2, -1) / (self.head_dim ** 0.5)  # (batch_size, num_heads, seq_len, seq_len)
+        inf_mask = torch.full_like(scores, float('-inf'))
+        mask = torch.triu(inf_mask, diagonal=1)
+        scores = scores + mask
         attn_weights = torch.nn.functional.softmax(scores, dim=-1)  # (batch_size, num_heads, seq_len, seq_len)
         out = attn_weights @ V  # (batch_size, num_heads, seq_len, head_dim)
         out = out.transpose(1, 2).contiguous().view(batch_size, seq_len, embed_size)  # (batch_size, seq_len, embed_size)
