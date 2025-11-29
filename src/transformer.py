@@ -83,7 +83,7 @@ class Transfomer(torch.nn.Module):
         x = self.attention(self.norm1(x))
         x += res
         res = x
-        x = self.ffn(self.norm2(x))
+        x = self.dropout(self.ffn(self.norm2(x)))
         x += res
         return x
     
