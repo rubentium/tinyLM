@@ -70,7 +70,7 @@ class Transfomer(torch.nn.Module):
         super().__init__()
         self.attention = MultiHeadAttention(embed_size, num_heads=num_heads)
         self.norm1 = torch.nn.LayerNorm(embed_size)
-        self.ff = torch.nn.Sequential(
+        self.ffn = torch.nn.Sequential(
             torch.nn.Linear(embed_size, ff_hidden_size),
             torch.nn.ReLU(),
             torch.nn.Linear(ff_hidden_size, embed_size)
@@ -79,14 +79,12 @@ class Transfomer(torch.nn.Module):
         self.dropout = torch.nn.Dropout(dropout)
 
     def forward(self, x):
-        # Self-attention block
-        attn_out = self.attention(x)
-        x = self.norm1(x + self.dropout(attn_out))
-
-        # Feed-forward block
-        ff_out = self.ff(x)
-        x = self.norm2(x + self.dropout(ff_out))
-
+        res = x
+        x = self.attention(self.norm1(x))
+        x += res
+        res = x
+        x = self.ffn(self.norm2(x))
+        x += res
         return x
     
 class Model(torch.nn.Module):
